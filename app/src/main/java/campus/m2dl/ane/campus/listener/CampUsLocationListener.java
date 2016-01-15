@@ -23,9 +23,9 @@ public class CampUsLocationListener implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        System.out.println("Changed");
-        campUsActivity.updateLocation(location.getLatitude(), location.getLongitude());
-        //Toast.makeText(campUsActivity.getBaseContext(), MessageFormat.format("x: {0} --- y: {1} --- z: {2}",location.getLatitude(), location.getLongitude(), location.getAltitude()), Toast.LENGTH_LONG).show();
+//        System.out.println("Changed");
+//        campUsActivity.updateLocation(location.getLatitude(), location.getLongitude());
+//        Toast.makeText(campUsActivity.getBaseContext(), MessageFormat.format("x: {0} --- y: {1} --- z: {2}",location.getLatitude(), location.getLongitude(), location.getAltitude()), Toast.LENGTH_LONG).show();
     }
 
     @Override
