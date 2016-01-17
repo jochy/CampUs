@@ -29,38 +29,71 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import campus.m2dl.ane.campus.listener.CampUsLocationListener;
 
 public class CampUsActivity extends AppCompatActivity {
-
-    public static final int POS_SIZE = 25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
 
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
+//        LocationManager locationManager = (LocationManager)
+//                getSystemService(Context.LOCATION_SERVICE);
+//
+//        LocationListener locationListener = new CampUsLocationListener(this);
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 
-        LocationListener locationListener = new CampUsLocationListener(this);
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+        // This is for the rotation
+        //System.out.println(map.getCameraPosition().bearing);
 
+        GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        setBackgroundMap(map);
+        showDebugMarker(map);
+
+        // Default Zoom + center on the Admin building
         CameraUpdate center =
                 CameraUpdateFactory.newLatLng(new LatLng(43.573503,
                         1.470537));
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-        GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         map.moveCamera(center);
         map.animateCamera(zoom);
-        //System.out.println(map.getCameraPosition().bearing);
+    }
 
+    private void setBackgroundMap(GoogleMap map){
         GroundOverlayOptions newarkMap = new GroundOverlayOptions()
-                .image(BitmapDescriptorFactory.fromResource(R.drawable.over))
-                .position(new LatLng(43.564646, 1.467138), 2500f, 2500f);
+                .image(BitmapDescriptorFactory.fromResource(R.drawable.mapover))
+                .position(new LatLng(43.56412, 1.467838), 3025f, 3050f);
 
         map.addGroundOverlay(newarkMap);
+    }
+
+    private void showDebugMarker(GoogleMap map){
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.562932, 1.466117))
+                .title("Administration"));
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.560219, 1.470301))
+                .title("U1"));
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.566994, 1.470158))
+                .title("Stand de tir à l'arc"));
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.568724, 1.462178))
+                .title("FAC pharma"));
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.570032, 1.467095))
+                .title("INSA"));
+
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(43.557593, 1.469441))
+                .title("4TP1"));
     }
 
     @Override
