@@ -1,6 +1,8 @@
 package campus.m2dl.ane.campus;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,37 +42,34 @@ public class CampUsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
 
-//        LocationManager locationManager = (LocationManager)
-//                getSystemService(Context.LOCATION_SERVICE);
-//
-//        LocationListener locationListener = new CampUsLocationListener(this);
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-
-        // This is for the rotation
-        //System.out.println(map.getCameraPosition().bearing);
-
         GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         setBackgroundMap(map);
         showDebugMarker(map);
 
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new CampUsLocationListener(this, map);
+        try {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), "Unable to start GPS", Toast.LENGTH_LONG).show();
+        }
+
         // Default Zoom + center on the Admin building
-        CameraUpdate center =
-                CameraUpdateFactory.newLatLng(new LatLng(43.573503,
-                        1.470537));
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+        CameraUpdate center = CameraUpdateFactory.newLatLng(MapConfiguration.CENTER_CAMERA);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(MapConfiguration.DEFAULT_ZOOM);
         map.moveCamera(center);
         map.animateCamera(zoom);
     }
 
-    private void setBackgroundMap(GoogleMap map){
+    private void setBackgroundMap(GoogleMap map) {
         GroundOverlayOptions newarkMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.mapover))
-                .position(new LatLng(43.56412, 1.467838), 3025f, 3050f);
+                .position(MapConfiguration.CENTER_MAP_GPS, MapConfiguration.MAP_WIDTH, MapConfiguration.MAP_HEIGHT);
 
         map.addGroundOverlay(newarkMap);
     }
 
-    private void showDebugMarker(GoogleMap map){
+    private void showDebugMarker(GoogleMap map) {
         map.addMarker(new MarkerOptions()
                 .position(new LatLng(43.562932, 1.466117))
                 .title("Administration"));
