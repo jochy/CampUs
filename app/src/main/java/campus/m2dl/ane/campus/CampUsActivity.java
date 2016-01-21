@@ -59,6 +59,8 @@ public class CampUsActivity extends AppCompatActivity {
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(MapConfiguration.DEFAULT_ZOOM);
         map.moveCamera(center);
         map.animateCamera(zoom);
+
+
     }
 
     private void setBackgroundMap(GoogleMap map) {
