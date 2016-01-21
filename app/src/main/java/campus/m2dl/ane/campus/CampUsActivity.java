@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -32,6 +33,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
 import campus.m2dl.ane.campus.listener.CampUsLocationListener;
 
@@ -61,6 +71,26 @@ public class CampUsActivity extends AppCompatActivity {
         map.animateCamera(zoom);
 
 
+    }
+
+    private void post(){
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL("http://camp-us.net16.net/createuser.php").openConnection();
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(true);
+
+            OutputStream os = httpURLConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write("");
+            writer.flush();
+            writer.close();
+            os.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setBackgroundMap(GoogleMap map) {

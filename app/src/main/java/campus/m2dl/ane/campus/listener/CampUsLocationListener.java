@@ -56,7 +56,9 @@ public class CampUsLocationListener implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         Toast.makeText(activity.getBaseContext(), "GPS disabled", Toast.LENGTH_SHORT).show();
-        position.remove();
-        position = null;
+        if(position != null) {
+            position.remove();
+            position = null;
+        }
     }
 }
