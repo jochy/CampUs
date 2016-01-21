@@ -9,6 +9,11 @@ public enum TagImg {
     WATER("Fuite d'eau", R.drawable.mpipe),
     DEGRADATION("Dégradation", R.drawable.mrepaire),
     RECYLCE("Recyclage", R.drawable.mtrash),
+    FOOD("Restauration", R.drawable.mfood),
+    BATTERY("Batterie", R.drawable.mbattery),
+    CARTBOARD("Carton", R.drawable.mcartboard),
+    GLASS("Verre", R.drawable.mglass),
+    TOILETS("Toilettes", R.drawable.mtoilets),
     OTHER("Divers", R.drawable.munknow);
 
     public String text;
