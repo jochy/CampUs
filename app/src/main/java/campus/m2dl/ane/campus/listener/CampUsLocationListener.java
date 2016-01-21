@@ -36,7 +36,7 @@ public class CampUsLocationListener implements LocationListener {
         if (position == null) {
             position = map.addMarker(new MarkerOptions()
                     .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .flat(true));
+                    .flat(false));
         }
         else {
             position.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));

@@ -61,7 +61,7 @@ public class UpdateMarkersTask extends AsyncTask {
 
                 for (POI p : matchPOI) {
                     p.marker = map.addMarker(new MarkerOptions()
-                            .flat(true)
+                            .flat(false)
                             .position(p.position)
                             .icon(BitmapDescriptorFactory.fromResource(p.tagImg.resourceId))
                             .title(p.tagImg.text));
