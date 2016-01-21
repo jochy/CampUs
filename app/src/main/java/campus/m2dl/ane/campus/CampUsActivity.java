@@ -6,11 +6,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,25 +22,32 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import campus.m2dl.ane.campus.listener.CampUsLocationListener;
+import campus.m2dl.ane.campus.model.POI;
+import campus.m2dl.ane.campus.thread.UpdateMarkersTask;
 
-public class CampUsActivity extends AppCompatActivity {
+public class CampUsActivity extends AppCompatActivity implements TextWatcher {
+
+    private List<POI> poiList = new ArrayList<>();
+    private EditText tags;
+    private GoogleMap map;
+    private UpdateMarkersTask updateMarkersTask;
+    private final Object lock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
 
-        GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+        tags = (EditText) findViewById(R.id.adresseMap);
+        tags.addTextChangedListener(this);
+
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         setBackgroundMap(map);
-        showDebugMarker(map);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new CampUsLocationListener(this, map);
@@ -54,27 +63,9 @@ public class CampUsActivity extends AppCompatActivity {
         map.moveCamera(center);
         map.animateCamera(zoom);
 
-
-    }
-
-    private void post(){
-        try {
-            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL("http://camp-us.net16.net/createuser.php").openConnection();
-            httpURLConnection.setRequestMethod("POST");
-            httpURLConnection.setDoInput(true);
-            httpURLConnection.setDoOutput(true);
-
-            OutputStream os = httpURLConnection.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
-            writer.write("");
-            writer.flush();
-            writer.close();
-            os.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Fixme: comment that line !
+        showDebugMarker();
+        updateMarkers();
     }
 
     private void setBackgroundMap(GoogleMap map) {
@@ -85,30 +76,8 @@ public class CampUsActivity extends AppCompatActivity {
         map.addGroundOverlay(newarkMap);
     }
 
-    private void showDebugMarker(GoogleMap map) {
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.562932, 1.466117))
-                .title("Administration"));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.560219, 1.470301))
-                .title("U1"));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.566994, 1.470158))
-                .title("Stand de tir à l'arc"));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.568724, 1.462178))
-                .title("FAC pharma"));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.570032, 1.467095))
-                .title("INSA"));
-
-        map.addMarker(new MarkerOptions()
-                .position(new LatLng(43.557593, 1.469441))
-                .title("4TP1"));
+    private void showDebugMarker() {
+        poiList = POImock.getPoiList();
     }
 
     @Override
@@ -137,5 +106,31 @@ public class CampUsActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(this, TagCreationActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // Nothing
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        updateMarkers();
+    }
+
+    private void updateMarkers(){
+        synchronized (lock) {
+            if (updateMarkersTask != null) {
+                updateMarkersTask.cancel(true);
+            }
+
+            updateMarkersTask = new UpdateMarkersTask(this, poiList, tags.getText().toString(), map);
+            updateMarkersTask.execute();
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        // Nothing
     }
 }
