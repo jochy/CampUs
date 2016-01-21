@@ -34,11 +34,15 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:ems="10"
             android:lines="5"
             android:maxLines="5"
             android:hint="Description"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:id="@+id/descriptionField" />
 
         <EditText
@@ -47,6 +51,10 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Tags"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:layout_marginBottom="10dp"
             android:id="@+id/tagList" />
 
         <TextView

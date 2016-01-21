@@ -20,6 +20,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/firstnameField"
             android:hint="Prénom"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
             android:inputType="textPersonName"
             android:layout_gravity="center_horizontal" />
 
@@ -29,6 +32,10 @@
             android:id="@+id/lastnameField"
             android:inputType="textPersonName"
             android:hint="Nom"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
             android:layout_gravity="center_horizontal" />
 
         <EditText
@@ -36,21 +43,22 @@
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:hint="Login"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
             android:id="@+id/loginField" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:hint="Email"
-            android:id="@+id/emailField"
-            android:layout_gravity="center_horizontal" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:hint="Mot de Passe"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
             android:id="@+id/password1Field" />
 
         <EditText
@@ -58,6 +66,11 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:hint="Mot de Passe (Vérification)"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/rect_text_edit1"
+            android:padding="10dp"
+            android:singleLine="true"
             android:id="@+id/password2Field" />
 
         <LinearLayout
@@ -65,6 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+
             android:onClick="cancelButton">
 
             <Button

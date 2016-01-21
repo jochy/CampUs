@@ -5,13 +5,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    EditText firstnameField,lastnameField,loginField,
+            password1Field,password2Field ;
+
+    String firstname,lastname,login,password1,password2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        firstnameField = (EditText)findViewById(R.id.firstnameField);
+        lastnameField = (EditText)findViewById(R.id.firstnameField);
+        loginField = (EditText)findViewById(R.id.firstnameField);
+        password1Field = (EditText)findViewById(R.id.firstnameField);
+        password2Field = (EditText)findViewById(R.id.firstnameField);
+
+    }
+
+    public void registerButton(View view)
+    {
+
     }
 
     @Override
