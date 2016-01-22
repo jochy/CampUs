@@ -16,10 +16,16 @@
         android:gravity="center"
         android:id="@+id/linearlayout">
 
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center_horizontal" />
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editText"
+            android:id="@+id/usernameLogin"
             android:hint="Login"
             android:background="@drawable/rect_text_edit1"
             android:padding="10dp"
@@ -36,7 +42,7 @@
             android:padding="10dp"
             android:layout_marginBottom="10dp"
             android:singleLine="true"
-            android:id="@+id/editText2" />
+            android:id="@+id/password1Login" />
 
         <Button
             android:layout_width="wrap_content"
