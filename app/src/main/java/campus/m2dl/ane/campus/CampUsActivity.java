@@ -21,15 +21,18 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import campus.m2dl.ane.campus.listener.CampUsLocationListener;
 import campus.m2dl.ane.campus.model.POI;
+import campus.m2dl.ane.campus.model.mock.POImock;
+import campus.m2dl.ane.campus.service.MessageService;
 import campus.m2dl.ane.campus.thread.UpdateMarkersTask;
 
-public class CampUsActivity extends AppCompatActivity implements TextWatcher {
+public class CampUsActivity extends AppCompatActivity implements TextWatcher, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private List<POI> poiList = new ArrayList<>();
     private EditText tags;
@@ -48,6 +51,8 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher {
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
         setBackgroundMap(map);
+        map.setOnInfoWindowClickListener(this);
+        map.setOnMarkerClickListener(this);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new CampUsLocationListener(this, map);
@@ -65,6 +70,7 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher {
 
         // Fixme: comment that line !
         showDebugMarker();
+
         updateMarkers();
     }
 
@@ -132,5 +138,28 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher {
     @Override
     public void afterTextChanged(Editable s) {
         // Nothing
+    }
+
+    public void updatePoiList(List<POI> poiList){
+        this.poiList = poiList;
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        for(POI p : poiList){
+            if(marker.equals(p.marker)){
+                Intent intent = new Intent(this, MarkerInfoActivity.class);
+                MessageService.message = p;
+
+                startActivity(intent);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails", Toast.LENGTH_SHORT).show();
+        return false;
     }
 }
