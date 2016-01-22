@@ -52,36 +52,43 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MapsInitializer.initialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
-        MapsInitializer.initialize(getApplicationContext());
 
-        tags = (EditText) findViewById(R.id.adresseMap);
-        tags.addTextChangedListener(this);
-
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        setBackgroundMap(map);
-        map.setOnInfoWindowClickListener(this);
-        map.setOnMarkerClickListener(this);
-
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new CampUsLocationListener(this, map);
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-        } catch (Exception e) {
-            Toast.makeText(getBaseContext(), "Unable to start GPS", Toast.LENGTH_LONG).show();
+            tags = (EditText) findViewById(R.id.adresseMap);
+            tags.addTextChangedListener(this);
+
+            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+            setBackgroundMap(map);
+            map.setOnInfoWindowClickListener(this);
+            map.setOnMarkerClickListener(this);
+
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationListener locationListener = new CampUsLocationListener(this, map);
+            try {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), "Unable to start GPS", Toast.LENGTH_LONG).show();
+            }
+
+            // Default Zoom + center on the Admin building
+            CameraUpdate center = CameraUpdateFactory.newLatLng(MapConfiguration.CENTER_CAMERA);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(MapConfiguration.DEFAULT_ZOOM);
+            map.moveCamera(center);
+            map.animateCamera(zoom);
+
+            // Fixme: comment that line !
+            showDebugMarker();
+
+            updateMarkers();
+        }catch(Exception e){
+            // If no GooglePlay service, then let google display its message
+            findViewById(R.id.adresseMap).setVisibility(View.INVISIBLE);
+            findViewById(R.id.validerLong).setVisibility(View.INVISIBLE);
+            e.printStackTrace();
         }
-
-        // Default Zoom + center on the Admin building
-        CameraUpdate center = CameraUpdateFactory.newLatLng(MapConfiguration.CENTER_CAMERA);
-        CameraUpdate zoom = CameraUpdateFactory.zoomTo(MapConfiguration.DEFAULT_ZOOM);
-        map.moveCamera(center);
-        map.animateCamera(zoom);
-
-        // Fixme: comment that line !
-        showDebugMarker();
-
-        updateMarkers();
     }
 
     private void setBackgroundMap(GoogleMap map) {
