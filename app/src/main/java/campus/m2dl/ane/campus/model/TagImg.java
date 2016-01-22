@@ -23,4 +23,15 @@ public enum TagImg {
         this.text = text;
         this.resourceId = resourceId;
     }
+
+
+    public static TagImg getValueOf(String s){
+        for(TagImg t : values()){
+            if(t.text.equals(s)){
+                return t;
+            }
+        }
+
+        return null;
+    }
 }

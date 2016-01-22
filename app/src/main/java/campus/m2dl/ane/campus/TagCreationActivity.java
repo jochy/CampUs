@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -31,6 +33,9 @@ public class TagCreationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         bitmap = (Bitmap) MessageService.message;
         setContentView(R.layout.activity_tag_creation);
+
+        ListView listView = (ListView) findViewById(R.id.tagListView);
+
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewTag);
         imageView.setImageBitmap(bitmap);
