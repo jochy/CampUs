@@ -85,14 +85,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Annuler"
-                android:id="@+id/cancelButton" />
+                android:id="@+id/cancelButton"
+                android:onClick="cancelButton" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Valider"
                 android:layout_alignParentRight="true"
-                android:id="@+id/validateButton" />
+                android:id="@+id/validateButton"
+                android:onClick="registerButton" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
