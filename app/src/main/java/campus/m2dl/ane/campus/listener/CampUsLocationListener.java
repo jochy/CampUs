@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +17,7 @@ import java.text.MessageFormat;
 
 import campus.m2dl.ane.campus.CampUsActivity;
 import campus.m2dl.ane.campus.R;
+import campus.m2dl.ane.campus.service.MessageService;
 
 /**
  * Created by Alexandre on 08/01/2016.
@@ -24,11 +26,13 @@ public class CampUsLocationListener implements LocationListener {
 
     private GoogleMap map;
     private Marker position;
-    private Activity activity;
+    private CampUsActivity activity;
+    private View takePicture;
 
-    public CampUsLocationListener(Activity activity, GoogleMap map) {
+    public CampUsLocationListener(CampUsActivity activity, GoogleMap map, View takePicture) {
         this.activity = activity;
         this.map = map;
+        this.takePicture = takePicture;
     }
 
     @Override
@@ -41,6 +45,9 @@ public class CampUsLocationListener implements LocationListener {
         else {
             position.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
         }
+
+        MessageService.currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+        takePicture.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -56,9 +63,11 @@ public class CampUsLocationListener implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         Toast.makeText(activity.getBaseContext(), "GPS disabled", Toast.LENGTH_SHORT).show();
-        if(position != null) {
+        if (position != null) {
             position.remove();
             position = null;
         }
+        MessageService.currentPosition = null;
+        takePicture.setVisibility(View.INVISIBLE);
     }
 }

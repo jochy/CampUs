@@ -66,7 +66,7 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
             map.setOnMarkerClickListener(this);
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            LocationListener locationListener = new CampUsLocationListener(this, map);
+            LocationListener locationListener = new CampUsLocationListener(this, map, findViewById(R.id.takePicture));
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
             } catch (Exception e) {
