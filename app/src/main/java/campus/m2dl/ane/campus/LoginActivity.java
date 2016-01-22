@@ -3,7 +3,10 @@ package campus.m2dl.ane.campus;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -78,19 +81,31 @@ public class LoginActivity extends AppCompatActivity {
         username = mLoginView.getText().toString();
         password = mPasswordView.getText().toString();
 
-        if (username.length() == 0) {
-            mLoginView.setError("Il me faut votre login !");
-            mLoginView.requestFocus();
-        } else if (password.length() == 0) {
-            mPasswordView.setError("Il me faut votre mot de passe !");
-            mPasswordView.requestFocus();
+
+        if (!isOnline()) {
+            Toast.makeText(getApplicationContext(), "Pas de réseau Internet", Toast.LENGTH_LONG).show();
         }
         else {
+            if (username.length() == 0) {
+                mLoginView.setError("Il me faut votre login !");
+                mLoginView.requestFocus();
+            } else if (password.length() == 0) {
+                mPasswordView.setError("Il me faut votre mot de passe !");
+                mPasswordView.requestFocus();
+            } else {
 
-            showProgress(true);
+                showProgress(true);
 
-            new UserLoginTask().execute("http://camp-us.net16.net/script_php/get_user.php");
+                new UserLoginTask().execute("http://camp-us.net16.net/script_php/get_user.php");
+            }
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
