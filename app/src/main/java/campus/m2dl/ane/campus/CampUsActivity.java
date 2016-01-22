@@ -2,9 +2,13 @@ package campus.m2dl.ane.campus;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -23,6 +28,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.Marker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +46,9 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
     private GoogleMap map;
     private UpdateMarkersTask updateMarkersTask;
     private final Object lock = new Object();
+    private File photo;
+
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +120,36 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
 
     public void takePicture(View view)
     {
-        Intent intent = new Intent(this, TagCreationActivity.class);
-        startActivity(intent);
+        // Création de l'intent de type ACTION_IMAGE_CAPTURE
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+
+        startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
+                Toast.makeText(this, Uri.fromFile(photo).toString(), Toast.LENGTH_LONG).show();
+
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media
+                            .getBitmap(getContentResolver(), Uri.fromFile(photo));
+
+                    // Rotate it
+                    bitmap = ExifUtils.rotateBitmap(photo.getAbsolutePath(), bitmap);
+
+                    Intent intent = new Intent(this, TagCreationActivity.class);
+                    MessageService.message = bitmap;
+                    startActivity(intent);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 
     @Override

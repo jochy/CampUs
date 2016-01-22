@@ -1,16 +1,24 @@
 package campus.m2dl.ane.campus;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import campus.m2dl.ane.campus.service.MessageService;
 
 public class TagCreationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bitmap bitmap = (Bitmap) MessageService.message;
         setContentView(R.layout.activity_tag_creation);
+
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewTag);
+        imageView.setImageBitmap(bitmap);
     }
 
     @Override
