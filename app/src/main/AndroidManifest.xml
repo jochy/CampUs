@@ -39,7 +39,7 @@
         </activity>
         <activity
             android:name=".MarkerInfoActivity"
-            android:label="@string/title_activity_marker_information" >
+            android:label="@string/title_activity_marker_information">
         </activity>
         <activity
             android:name=".TagCreationActivity"

@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import campus.m2dl.ane.campus.CampUsActivity;
 import campus.m2dl.ane.campus.model.POI;
 
 /**
@@ -17,12 +18,12 @@ import campus.m2dl.ane.campus.model.POI;
  */
 public class UpdateMarkersTask extends AsyncTask {
 
-    private Activity activity;
+    private CampUsActivity activity;
     private List<POI> poiList;
     private String query;
     private GoogleMap map;
 
-    public UpdateMarkersTask(Activity activity, List<POI> poiList, String query, GoogleMap map) {
+    public UpdateMarkersTask(CampUsActivity activity, List<POI> poiList, String query, GoogleMap map) {
         this.activity = activity;
         this.poiList = poiList;
         this.query = query != null ? query.toLowerCase() : "";
@@ -32,6 +33,10 @@ public class UpdateMarkersTask extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] params) {
         final List<POI> matchPOI = new ArrayList<>();
+
+        if(poiList == null || query == null){
+            return null;
+        }
 
         for (final POI p : poiList) {
             boolean match = false;
@@ -69,6 +74,8 @@ public class UpdateMarkersTask extends AsyncTask {
                 }
             }
         });
+
+        activity.updatePoiList(poiList);
 
         return null;
     }

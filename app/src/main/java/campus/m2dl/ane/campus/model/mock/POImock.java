@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus;
+package campus.m2dl.ane.campus.model.mock;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
