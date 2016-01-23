@@ -1,6 +1,7 @@
 package campus.m2dl.ane.campus.activity;
 
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,8 +13,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,6 +93,61 @@ public class TagCreationActivity extends AppCompatActivity {
         poi.date = new Date();
         poi.tagImg = (TagImg) ((Spinner) findViewById(R.id.spinner)).getSelectedItem();
 
+        new SendPoiToDB().execute(poi);
         // TODO
     }
+
+    public class SendPoiToDB extends AsyncTask<POI, Void, String> {
+
+        String response = "";
+
+
+        @Override
+        protected String doInBackground(POI... pois) {
+
+            POI poi = pois[0];
+            try {
+
+
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/insert_poi.php");
+
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(6);
+                /** TODO  **/
+                nameValuePairs.add(new BasicNameValuePair("longitude",String.valueOf(poi.position.longitude)));
+                nameValuePairs.add(new BasicNameValuePair("latitude", String.valueOf(poi.position.latitude)));
+                nameValuePairs.add(new BasicNameValuePair("description", poi.description));
+                nameValuePairs.add(new BasicNameValuePair("user", poi.sender.getUsername()));
+                nameValuePairs.add(new BasicNameValuePair("type", ""));
+                nameValuePairs.add(new BasicNameValuePair("tags", poi.tags.toString()));
+
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                response = httpclient.execute(httppost, responseHandler);
+
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                response = "error";
+                return "error";
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String success) {
+
+            if (!response.trim().equals("error")) {
+                Toast.makeText(getApplicationContext(), "Le tag a été ajouté !", Toast.LENGTH_LONG).show();
+                finish();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Une erreur est survenue lors de la création du tag", Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
 }
