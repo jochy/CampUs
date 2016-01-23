@@ -24,7 +24,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
 import java.util.List;
 
-import campus.m2dl.ane.campus.CampUsActivity;
+import campus.m2dl.ane.campus.activity.CampUsActivity;
 
 /**
  * Created by Nabil on 23/01/16.
