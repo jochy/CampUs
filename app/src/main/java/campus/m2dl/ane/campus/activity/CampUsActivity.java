@@ -182,6 +182,11 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         this.poiList = poiList;
     }
 
+    @Override
+    public void runOnUiThread(Runnable runnable) {
+
+    }
+
     public List<POI> getPoiList() {
         return this.poiList;
     }
