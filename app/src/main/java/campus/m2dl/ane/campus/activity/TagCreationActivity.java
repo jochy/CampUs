@@ -36,6 +36,7 @@ import campus.m2dl.ane.campus.activity.adapter.TagListAdapter;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.model.TagImg;
 import campus.m2dl.ane.campus.service.MessageService;
+import campus.m2dl.ane.campus.thread.SendPoiToDBTask;
 
 public class TagCreationActivity extends AppCompatActivity {
 
@@ -81,6 +82,8 @@ public class TagCreationActivity extends AppCompatActivity {
     }
 
     public void sendNewPoi(View v) {
+        SendPoiToDBTask task;
+
         POI poi = new POI();
         poi.image = bitmap;
         poi.position = currentPosition;
@@ -93,61 +96,8 @@ public class TagCreationActivity extends AppCompatActivity {
         poi.date = new Date();
         poi.tagImg = (TagImg) ((Spinner) findViewById(R.id.spinner)).getSelectedItem();
 
-        new SendPoiToDB().execute(poi);
-        // TODO
-    }
-
-    public class SendPoiToDB extends AsyncTask<POI, Void, String> {
-
-        String response = "";
-
-
-        @Override
-        protected String doInBackground(POI... pois) {
-
-            POI poi = pois[0];
-            try {
-
-
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/insert_poi.php");
-
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(6);
-                /** TODO  **/
-                nameValuePairs.add(new BasicNameValuePair("longitude",String.valueOf(poi.position.longitude)));
-                nameValuePairs.add(new BasicNameValuePair("latitude", String.valueOf(poi.position.latitude)));
-                nameValuePairs.add(new BasicNameValuePair("description", poi.description));
-                nameValuePairs.add(new BasicNameValuePair("user", poi.sender.getUsername()));
-                nameValuePairs.add(new BasicNameValuePair("type", ""));
-                nameValuePairs.add(new BasicNameValuePair("tags", poi.tags.toString()));
-
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                response = httpclient.execute(httppost, responseHandler);
-
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-                response = "error";
-                return "error";
-            }
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String success) {
-
-            if (!response.trim().equals("error")) {
-                Toast.makeText(getApplicationContext(), "Le tag a été ajouté !", Toast.LENGTH_LONG).show();
-                finish();
-            }
-            else {
-                Toast.makeText(getApplicationContext(), "Une erreur est survenue lors de la création du tag", Toast.LENGTH_LONG).show();
-            }
-
-        }
+        task = new SendPoiToDBTask(this);
+        task.execute(poi);
     }
 
 }
