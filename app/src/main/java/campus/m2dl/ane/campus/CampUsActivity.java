@@ -6,17 +6,18 @@ import android.graphics.Bitmap;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -26,16 +27,35 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import campus.m2dl.ane.campus.listener.CampUsLocationListener;
 import campus.m2dl.ane.campus.model.POI;
-import campus.m2dl.ane.campus.model.mock.POImock;
+import campus.m2dl.ane.campus.model.TagImg;
 import campus.m2dl.ane.campus.service.MessageService;
 import campus.m2dl.ane.campus.thread.UpdateMarkersTask;
 
@@ -100,7 +120,10 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
     }
 
     private void showDebugMarker() {
-        poiList = POImock.getPoiList();
+       // poiList = POImock.getPoiList();
+        new RetreivePOITask().execute("http://camp-us.net16.net/script_php/get_all_poi.php");
+
+
     }
 
     @Override
@@ -207,4 +230,107 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails", Toast.LENGTH_SHORT).show();
         return false;
     }
+
+
+    public class RetreivePOITask extends AsyncTask<String, Void, String> {
+
+        POI poi ;
+        @Override
+        protected String doInBackground(String... urls) {
+
+            HttpClient httpclient = new DefaultHttpClient();
+            try {
+                poiList.clear();
+                HttpPost httpPost = new HttpPost(urls[0]);
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpResponse httpresponse = httpclient.execute(httpPost);
+                HttpEntity httpentity = httpresponse.getEntity();
+
+                if (httpentity != null) {
+                    JSONObject jso = new JSONObject(inputStreamToString(
+                            httpentity.getContent()).toString());
+                    JSONArray tabPOI = jso.optJSONArray("POI");
+
+                    for (int i = 0; i < tabPOI.length(); i++) {
+
+                        JSONObject lignePoi = tabPOI.getJSONObject(i);
+                        poi = new POI();
+                        poi.sender = null;
+                        poi.description = lignePoi.optString("description");
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        Date startDate = new Date();
+                        try {
+                            startDate = df.parse(lignePoi.optString("date"));
+                            String newDateString = df.format(startDate);
+                            System.out.println(newDateString);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        poi.date = startDate ;
+                        poi.poiId = lignePoi.optInt("ID");
+                        poi.image = null;
+                        poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
+                        poi.position = new LatLng(lignePoi.optDouble("latitude"),lignePoi.optDouble("longitude"));
+                        List<String> items = new ArrayList<String>(Arrays.asList(lignePoi.optString("tags").split("\\s+")));
+                        poi.tags = items ;
+                        poiList.add(poi);
+                    }
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_LONG).show();
+            }
+
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String success) {
+
+
+            /*for (int i = 0; i < poiList.size() ; i++) {
+
+            }
+            System.out.prinlnt(); */
+
+        }
+
+
+
+
+        public StringBuilder inputStreamToString(InputStream is) {
+            BufferedReader br = null;
+            StringBuilder sb = new StringBuilder();
+            try {
+                br = new BufferedReader(new InputStreamReader(is));
+                String ligne = br.readLine();
+                while (ligne != null) {
+                    sb.append(ligne);
+                    ligne = br.readLine();
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Log.e("erreur de flux d'entree", e.getMessage());
+            } finally {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            return sb;
+        }
+
+
+
+    }
+
+
+
 }

@@ -123,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost(urls[0]);
 
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
                 nameValuePairs.add(new BasicNameValuePair("firstname",firstname ));
                 nameValuePairs.add(new BasicNameValuePair("lastname",lastname ));
                 nameValuePairs.add(new BasicNameValuePair("username",login));
