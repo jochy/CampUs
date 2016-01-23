@@ -17,7 +17,7 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".CampUsActivity"
+            android:name=".activity.CampUsActivity"
             android:label="@string/app_name" >
         </activity>
 
@@ -26,7 +26,7 @@
             android:value="AIzaSyBt8RWC4FLFin-CNnv_e6o3p4QIv1zeAAA" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,15 +35,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:label="@string/title_activity_register" >
         </activity>
         <activity
-            android:name=".MarkerInfoActivity"
+            android:name=".activity.MarkerInfoActivity"
             android:label="@string/title_activity_marker_information">
         </activity>
         <activity
-            android:name=".TagCreationActivity"
+            android:name=".activity.TagCreationActivity"
             android:label="@string/title_activity_tag_creation" >
         </activity>
     </application>

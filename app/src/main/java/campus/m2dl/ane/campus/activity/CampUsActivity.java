@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus;
+package campus.m2dl.ane.campus.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,19 +51,23 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import campus.m2dl.ane.campus.listener.CampUsLocationListener;
+import campus.m2dl.ane.campus.ExifUtils;
+import campus.m2dl.ane.campus.MapConfiguration;
+import campus.m2dl.ane.campus.R;
+import campus.m2dl.ane.campus.activity.listener.CampUsLocationListener;
+import campus.m2dl.ane.campus.activity.listener.CampUsOnInfoWindowsClickListener;
+import campus.m2dl.ane.campus.activity.listener.CampUsTextWatcher;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.model.TagImg;
+import campus.m2dl.ane.campus.service.IUpdateMarkerServiceConsumer;
 import campus.m2dl.ane.campus.service.MessageService;
-import campus.m2dl.ane.campus.thread.UpdateMarkersTask;
+import campus.m2dl.ane.campus.service.UpdateMarkersService;
 
-public class CampUsActivity extends AppCompatActivity implements TextWatcher, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
+public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, IUpdateMarkerServiceConsumer {
 
     private List<POI> poiList = new ArrayList<>();
     private EditText tags;
     private GoogleMap map;
-    private UpdateMarkersTask updateMarkersTask;
-    private final Object lock = new Object();
     private File photo;
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
@@ -75,22 +77,25 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         MapsInitializer.initialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
+        // Fixme: comment that line !
+        showDebugMarker();
 
         try {
             tags = (EditText) findViewById(R.id.adresseMap);
-            tags.addTextChangedListener(this);
 
             map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             setBackgroundMap(map);
-            map.setOnInfoWindowClickListener(this);
+            map.setOnInfoWindowClickListener(new CampUsOnInfoWindowsClickListener(this));
             map.setOnMarkerClickListener(this);
+            CampUsTextWatcher campUsTextWatcher = new CampUsTextWatcher(this, map);
+            tags.addTextChangedListener(campUsTextWatcher);
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             LocationListener locationListener = new CampUsLocationListener(this, map, findViewById(R.id.takePicture));
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
             } catch (Exception e) {
-                Toast.makeText(getBaseContext(), "Unable to start GPS", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS", Toast.LENGTH_LONG).show();
             }
 
             // Default Zoom + center on the Admin building
@@ -99,14 +104,10 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
             map.moveCamera(center);
             map.animateCamera(zoom);
 
-            // Fixme: comment that line !
-            showDebugMarker();
-
-            updateMarkers();
-        }catch(Exception e){
+            UpdateMarkersService.getInstance().updateMarkers(this, getPoiList(), map, null);
+        } catch (Exception e) {
             // If no GooglePlay service, then let google display its message
             findViewById(R.id.adresseMap).setVisibility(View.INVISIBLE);
-            findViewById(R.id.validerLong).setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
     }
@@ -120,10 +121,9 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
     }
 
     private void showDebugMarker() {
-       // poiList = POImock.getPoiList();
+        // Fixme: don't use that method
+        // poiList = POImock.getPoiList();
         new RetreivePOITask().execute("http://camp-us.net16.net/script_php/get_all_poi.php");
-
-
     }
 
     @Override
@@ -148,8 +148,7 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         return super.onOptionsItemSelected(item);
     }
 
-    public void takePicture(View view)
-    {
+    public void takePicture(View view) {
         // Création de l'intent de type ACTION_IMAGE_CAPTURE
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
@@ -162,8 +161,6 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
-                Toast.makeText(this, Uri.fromFile(photo).toString(), Toast.LENGTH_LONG).show();
-
                 try {
                     Bitmap bitmap = MediaStore.Images.Media
                             .getBitmap(getContentResolver(), Uri.fromFile(photo));
@@ -174,7 +171,6 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
                     Intent intent = new Intent(this, TagCreationActivity.class);
                     MessageService.message = bitmap;
                     startActivity(intent);
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -182,47 +178,12 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         }
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        // Nothing
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        updateMarkers();
-    }
-
-    private void updateMarkers(){
-        synchronized (lock) {
-            if (updateMarkersTask != null) {
-                updateMarkersTask.cancel(true);
-            }
-
-            updateMarkersTask = new UpdateMarkersTask(this, poiList, tags.getText().toString(), map);
-            updateMarkersTask.execute();
-        }
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        // Nothing
-    }
-
-    public void updatePoiList(List<POI> poiList){
+    public void updatePoiList(List<POI> poiList) {
         this.poiList = poiList;
     }
 
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        for(POI p : poiList){
-            if(marker.equals(p.marker)){
-                Intent intent = new Intent(this, MarkerInfoActivity.class);
-                MessageService.message = p;
-
-                startActivity(intent);
-                break;
-            }
-        }
+    public List<POI> getPoiList() {
+        return this.poiList;
     }
 
     @Override
@@ -234,7 +195,8 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
 
     public class RetreivePOITask extends AsyncTask<String, Void, String> {
 
-        POI poi ;
+        POI poi;
+
         @Override
         protected String doInBackground(String... urls) {
 
@@ -267,20 +229,20 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        poi.date = startDate ;
+                        poi.date = startDate;
                         poi.poiId = lignePoi.optInt("ID");
                         poi.image = null;
                         poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
-                        poi.position = new LatLng(lignePoi.optDouble("latitude"),lignePoi.optDouble("longitude"));
+                        poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
                         List<String> items = new ArrayList<String>(Arrays.asList(lignePoi.optString("tags").split("\\s+")));
-                        poi.tags = items ;
+                        poi.tags = items;
                         poiList.add(poi);
                     }
 
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
             }
 
 
@@ -299,9 +261,6 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
 
         }
 
-
-
-
         public StringBuilder inputStreamToString(InputStream is) {
             BufferedReader br = null;
             StringBuilder sb = new StringBuilder();
@@ -313,14 +272,12 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
                     ligne = br.readLine();
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
-                Log.e("erreur de flux d'entree", e.getMessage());
+                Log.e("Erreur de flux d'entree", e.getMessage());
             } finally {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -328,9 +285,7 @@ public class CampUsActivity extends AppCompatActivity implements TextWatcher, Go
         }
 
 
-
     }
-
 
 
 }

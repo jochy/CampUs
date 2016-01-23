@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus;
+package campus.m2dl.ane.campus.activity;
 
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import campus.m2dl.ane.campus.R;
+import campus.m2dl.ane.campus.activity.adapter.TagListAdapter;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.model.TagImg;
 import campus.m2dl.ane.campus.service.MessageService;
@@ -34,8 +37,9 @@ public class TagCreationActivity extends AppCompatActivity {
         bitmap = (Bitmap) MessageService.message;
         setContentView(R.layout.activity_tag_creation);
 
-        ListView listView = (ListView) findViewById(R.id.tagListView);
-
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setAdapter(new TagListAdapter(getBaseContext(), R.layout.list_adapter, Arrays.asList(TagImg.values())));
+        spinner.setSelection(TagImg.values().length - 1);
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewTag);
         imageView.setImageBitmap(bitmap);
@@ -76,7 +80,7 @@ public class TagCreationActivity extends AppCompatActivity {
             poi.tags.add(s);
         }
         poi.date = new Date();
-        poi.tagImg = TagImg.OTHER; // Fixme : allow user to change that !
+        poi.tagImg = (TagImg) ((Spinner) findViewById(R.id.spinner)).getSelectedItem();
 
         // TODO
     }

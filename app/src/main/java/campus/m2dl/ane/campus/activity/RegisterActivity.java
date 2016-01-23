@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus;
+package campus.m2dl.ane.campus.activity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +20,8 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import campus.m2dl.ane.campus.R;
 
 public class RegisterActivity extends AppCompatActivity {
 

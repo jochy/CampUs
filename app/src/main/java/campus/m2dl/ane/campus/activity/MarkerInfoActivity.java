@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus;
+package campus.m2dl.ane.campus.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import campus.m2dl.ane.campus.R;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.service.MessageService;
 

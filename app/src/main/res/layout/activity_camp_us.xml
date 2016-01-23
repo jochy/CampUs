@@ -12,8 +12,8 @@
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_margin="10sp"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp">
 
         <EditText
             android:id="@+id/adresseMap"
@@ -23,28 +23,20 @@
             android:ems="15"
             android:hint="Rechercher un Tag"
             android:padding="10dp"
-            android:singleLine="true" />
-
-        <Button
-            android:id="@+id/validerLong"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_gravity="right|center_vertical"
-            android:background="@drawable/look_for" />
+            android:singleLine="true"/>
     </FrameLayout>
-
-
 
     <ImageButton
         android:id="@+id/takePicture"
-        android:background="@drawable/takepicture"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:onClick="takePicture"
-        android:layout_marginRight="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginRight="10dp"
+        android:background="@drawable/takepicture"
+        android:onClick="takePicture"
+        android:visibility="invisible"/>
 
 
 </RelativeLayout>

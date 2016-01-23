@@ -1,6 +1,5 @@
-package campus.m2dl.ane.campus.listener;
+package campus.m2dl.ane.campus.activity.listener;
 
-import android.app.Activity;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -8,15 +7,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.text.MessageFormat;
-
-import campus.m2dl.ane.campus.CampUsActivity;
-import campus.m2dl.ane.campus.R;
+import campus.m2dl.ane.campus.activity.CampUsActivity;
 import campus.m2dl.ane.campus.service.MessageService;
 
 /**

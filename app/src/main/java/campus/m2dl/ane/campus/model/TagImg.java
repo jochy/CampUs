@@ -6,7 +6,7 @@ import campus.m2dl.ane.campus.R;
  * Created by Alexandre on 21/01/2016.
  */
 public enum TagImg {
-    WATER("Fuite d'eau", R.drawable.mpipe),
+    WATER("Eau", R.drawable.mpipe),
     DEGRADATION("Dégradation", R.drawable.mrepaire),
     RECYLCE("Recyclage", R.drawable.mtrash),
     FOOD("Restauration", R.drawable.mfood),
@@ -14,6 +14,8 @@ public enum TagImg {
     CARTBOARD("Carton", R.drawable.mcartboard),
     GLASS("Verre", R.drawable.mglass),
     TOILETS("Toilettes", R.drawable.mtoilets),
+    PAINT("Peinture", R.drawable.mpaint),
+    CONSTRUCTION("Travaux", R.drawable.mconstruction),
     OTHER("Divers", R.drawable.munknow);
 
     public String text;
@@ -33,5 +35,10 @@ public enum TagImg {
         }
 
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return this.text;
     }
 }
