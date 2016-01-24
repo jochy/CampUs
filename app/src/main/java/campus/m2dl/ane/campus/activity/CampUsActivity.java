@@ -6,18 +6,15 @@ import android.graphics.Bitmap;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,32 +22,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-
 import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.ExifUtils;
 import campus.m2dl.ane.campus.MapConfiguration;
@@ -59,18 +35,14 @@ import campus.m2dl.ane.campus.activity.listener.CampUsLocationListener;
 import campus.m2dl.ane.campus.activity.listener.CampUsOnInfoWindowsClickListener;
 import campus.m2dl.ane.campus.activity.listener.CampUsTextWatcher;
 import campus.m2dl.ane.campus.model.POI;
-import campus.m2dl.ane.campus.model.TagImg;
 import campus.m2dl.ane.campus.model.mock.POImock;
 import campus.m2dl.ane.campus.service.IUpdateMarkerServiceConsumer;
 import campus.m2dl.ane.campus.service.MessageService;
-import campus.m2dl.ane.campus.service.UpdateMarkersService;
 import campus.m2dl.ane.campus.thread.RetreivePOITask;
 
 public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, IUpdateMarkerServiceConsumer {
 
     private List<POI> poiList = new ArrayList<>();
-    private EditText tags;
-    private GoogleMap map;
     private File photo;
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
@@ -82,21 +54,25 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         setContentView(R.layout.activity_camp_us);
 
         try {
-            tags = (EditText) findViewById(R.id.adresseMap);
+            EditText tags = (EditText) findViewById(R.id.adresseMap);
 
-            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+            GoogleMap map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             setBackgroundMap(map);
             map.setOnInfoWindowClickListener(new CampUsOnInfoWindowsClickListener(this));
             map.setOnMarkerClickListener(this);
             CampUsTextWatcher campUsTextWatcher = new CampUsTextWatcher(this, map);
             tags.addTextChangedListener(campUsTextWatcher);
 
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            LocationListener locationListener = new CampUsLocationListener(this, map, findViewById(R.id.takePicture));
+            LocationManager locationManager = (LocationManager) getSystemService(
+                    Context.LOCATION_SERVICE);
+            LocationListener locationListener = new CampUsLocationListener(this, map,
+                    findViewById(R.id.takePicture));
             try {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        AppConfiguration.SENSOR_REFRESH_INTERVAL, 10, locationListener);
             } catch (Exception e) {
-                Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS",
+                        Toast.LENGTH_LONG).show();
             }
 
             // Default Zoom + center on the Admin building
@@ -105,10 +81,12 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
             map.moveCamera(center);
             map.animateCamera(zoom);
 
-            new RetreivePOITask(this, (EditText) findViewById(R.id.adresseMap), map).execute(AppConfiguration.URL_RETREIVE_POI);
+            new RetreivePOITask(this, (EditText) findViewById(R.id.adresseMap), map)
+                    .execute(AppConfiguration.URL_RETREIVE_POI);
 
-            // Fixme: comment that line !
-            //showDebugMarker();
+            if (AppConfiguration.DEBUG) {
+                showDebugMarker();
+            }
 
         } catch (Exception e) {
             // If no GooglePlay service, then let google display its message
@@ -120,7 +98,8 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
     private void setBackgroundMap(GoogleMap map) {
         GroundOverlayOptions newarkMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.mapover))
-                .position(MapConfiguration.CENTER_MAP_GPS, MapConfiguration.MAP_WIDTH, MapConfiguration.MAP_HEIGHT);
+                .position(MapConfiguration.CENTER_MAP_GPS, MapConfiguration.MAP_WIDTH,
+                        MapConfiguration.MAP_HEIGHT);
 
         map.addGroundOverlay(newarkMap);
     }
@@ -191,7 +170,8 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails",
+                Toast.LENGTH_SHORT).show();
         return false;
     }
 

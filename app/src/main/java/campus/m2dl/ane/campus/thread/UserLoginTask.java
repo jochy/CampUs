@@ -24,6 +24,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
 import java.util.List;
 
+import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.activity.CampUsActivity;
 
 /**
@@ -31,39 +32,34 @@ import campus.m2dl.ane.campus.activity.CampUsActivity;
  */
 public class UserLoginTask extends AsyncTask<String, Void, String> {
 
-    String response = "";
-    String username , password ;
-    Context context ;
-    EditText mPasswordView ;
-    View mProgressView;
+    private String response = "";
+    private String username, password;
+    private Context context;
+    private EditText mPasswordView;
+    private View mProgressView;
 
-
-    public UserLoginTask(String username,String password, Context context , EditText mPasswordView, View mProgressView )
-    {
-        this.username = username ;
-        this.password = password ;
-        this.context = context ;
-        this.mPasswordView = mPasswordView ;
-        this.mProgressView = mProgressView ;
+    public UserLoginTask(String username, String password, Context context, EditText mPasswordView,
+                         View mProgressView) {
+        this.username = username;
+        this.password = password;
+        this.context = context;
+        this.mPasswordView = mPasswordView;
+        this.mProgressView = mProgressView;
     }
 
     @Override
     protected String doInBackground(String... urls) {
-
-
         try {
-
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/get_user.php");
+            HttpPost httppost = new HttpPost(AppConfiguration.URL_LOGIN);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("username",username ));
+            nameValuePairs.add(new BasicNameValuePair("username", username));
             nameValuePairs.add(new BasicNameValuePair("password", password));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             response = httpclient.execute(httppost, responseHandler);
-
         } catch (Exception e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
             response = "error";
@@ -75,12 +71,11 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String success) {
-
         if (!response.trim().equals("error")) {
             Toast.makeText(context, "Bienvenue " + username + " !", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(context, CampUsActivity.class);
             context.startActivity(intent);
-            ((Activity)context).finish();
+            ((Activity) context).finish();
         }
         else {
             Toast.makeText(context, "Login ou mot de passe incorrect !", Toast.LENGTH_LONG).show();
@@ -97,7 +92,8 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+            int shortAnimTime = context.getResources()
+                    .getInteger(android.R.integer.config_shortAnimTime);
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
@@ -107,7 +103,8 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
-        } else {
+        }
+        else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);

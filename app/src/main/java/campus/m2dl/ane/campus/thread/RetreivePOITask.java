@@ -1,10 +1,8 @@
 package campus.m2dl.ane.campus.thread;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -77,7 +75,7 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                         JSONObject lignePoi = tabPOI.getJSONObject(i);
 
                         POI poi = new POI();
-                        poi.sender = null;
+                        poi.sender = null; // Fixme : affect it
                         poi.description = lignePoi.optString("description");
                         Date startDate;
                         try {
@@ -91,8 +89,7 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                         poi.image = null; // Fixme : affect it
                         poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
                         poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
-                        List<String> items = new ArrayList<String>(Arrays.asList(lignePoi.optString("tags").split("\\s+")));
-                        poi.tags = items;
+                        poi.tags = Arrays.asList(lignePoi.optString("tags").split("\\s+"));;
                         poiList.add(poi);
                     }
                 }
@@ -110,7 +107,7 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
             });
 
             try {
-                Thread.sleep(AppConfiguration.REFRESH_INTERVAL);
+                Thread.sleep(AppConfiguration.POI_REFRESH_INTERVAL);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

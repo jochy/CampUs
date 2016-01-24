@@ -22,7 +22,8 @@ public class UpdateMarkersTask extends AsyncTask<String, Void, String> {
     private String query;
     private GoogleMap map;
 
-    public UpdateMarkersTask(IUpdateMarkerServiceConsumer consumer, List<POI> poiList, String query, GoogleMap map) {
+    public UpdateMarkersTask(IUpdateMarkerServiceConsumer consumer, List<POI> poiList, String query,
+                             GoogleMap map) {
         this.consumer = consumer;
         this.poiList = poiList != null ? poiList : new ArrayList<POI>();
         this.query = query != null ? query.toLowerCase() : "";

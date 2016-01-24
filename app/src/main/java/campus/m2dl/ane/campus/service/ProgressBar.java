@@ -28,7 +28,8 @@ public class ProgressBar {
                     v.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
-        } else {
+        }
+        else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             v.setVisibility(show ? View.VISIBLE : View.GONE);
