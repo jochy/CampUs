@@ -3,8 +3,10 @@ package campus.m2dl.ane.campus.thread;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpEntity;
@@ -29,32 +31,37 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.model.TagImg;
+import campus.m2dl.ane.campus.service.IUpdateMarkerServiceConsumer;
+import campus.m2dl.ane.campus.service.UpdateMarkersService;
 
 /**
  * Created by Nabil on 23/01/16.
  */
 
-    public class RetreivePOITask extends AsyncTask<String, Void, String> {
+public class RetreivePOITask extends AsyncTask<String, Void, String> {
 
-        POI poi ;
-        List<POI> poiList ;
-        Context context ;
+    private IUpdateMarkerServiceConsumer consumer;
+    private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    private EditText filterText;
+    private GoogleMap map;
 
-    public RetreivePOITask( List<POI> poiList , Context context) {
+    private List<POI> poiList;
 
-        this.poiList = poiList;
-        this.context = context ;
+    public RetreivePOITask(IUpdateMarkerServiceConsumer consumer, EditText filterText, GoogleMap map) {
+        this.consumer = consumer;
+        this.filterText = filterText;
+        this.map = map;
     }
 
-
-        @Override
-        protected String doInBackground(String... urls) {
-
+    @Override
+    protected String doInBackground(String... urls) {
+        while (!isCancelled()) {
+            poiList = new ArrayList<>();
             HttpClient httpclient = new DefaultHttpClient();
             try {
-                poiList.clear();
                 HttpPost httpPost = new HttpPost(urls[0]);
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                 httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
@@ -67,78 +74,78 @@ import campus.m2dl.ane.campus.model.TagImg;
                     JSONArray tabPOI = jso.optJSONArray("POI");
 
                     for (int i = 0; i < tabPOI.length(); i++) {
-
                         JSONObject lignePoi = tabPOI.getJSONObject(i);
-                        poi = new POI();
+
+                        POI poi = new POI();
                         poi.sender = null;
                         poi.description = lignePoi.optString("description");
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        Date startDate = new Date();
+                        Date startDate;
                         try {
                             startDate = df.parse(lignePoi.optString("date"));
-                            String newDateString = df.format(startDate);
-                            System.out.println(newDateString);
                         } catch (ParseException e) {
+                            startDate = new Date();
                             e.printStackTrace();
                         }
-                        poi.date = startDate ;
+                        poi.date = startDate;
                         poi.poiId = lignePoi.optInt("ID");
-                        poi.image = null;
+                        poi.image = null; // Fixme : affect it
                         poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
-                        poi.position = new LatLng(lignePoi.optDouble("latitude"),lignePoi.optDouble("longitude"));
+                        poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
                         List<String> items = new ArrayList<String>(Arrays.asList(lignePoi.optString("tags").split("\\s+")));
-                        poi.tags = items ;
+                        poi.tags = items;
                         poiList.add(poi);
                     }
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
+                Log.e("RetrievePOITask", e.getMessage());
             }
 
+            consumer.updatePoiList(poiList);
+            consumer.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    UpdateMarkersService.getInstance().updateMarkers(consumer, poiList, map, filterText.getText().toString());
+                }
+            });
 
-            return null;
-
-        }
-
-        @Override
-        protected void onPostExecute(String success) {
-
-
-        }
-
-
-
-
-        public StringBuilder inputStreamToString(InputStream is) {
-            BufferedReader br = null;
-            StringBuilder sb = new StringBuilder();
             try {
-                br = new BufferedReader(new InputStreamReader(is));
-                String ligne = br.readLine();
-                while (ligne != null) {
-                    sb.append(ligne);
-                    ligne = br.readLine();
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Thread.sleep(AppConfiguration.REFRESH_INTERVAL);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-                Log.e("erreur de flux d'entree", e.getMessage());
-            } finally {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
-            return sb;
         }
 
-
-
+        return null;
     }
+
+    @Override
+    protected void onPostExecute(String success) {
+        // Nothing
+    }
+
+    public StringBuilder inputStreamToString(InputStream is) {
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            br = new BufferedReader(new InputStreamReader(is));
+            String ligne;
+            while ((ligne = br.readLine()) != null) {
+                sb.append(ligne);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("erreur de flux d'entree", e.getMessage());
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb;
+    }
+}
 
 
 

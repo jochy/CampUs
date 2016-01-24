@@ -1,5 +1,8 @@
 package campus.m2dl.ane.campus.service;
 
+import android.os.AsyncTask;
+import android.os.Build;
+
 import com.google.android.gms.maps.GoogleMap;
 
 import java.util.List;
@@ -16,22 +19,26 @@ public class UpdateMarkersService {
     private Object lock;
     private UpdateMarkersTask updateMarkersTask;
 
-    private UpdateMarkersService(){
+    private UpdateMarkersService() {
         this.lock = new Object();
     }
 
-    public void updateMarkers(IUpdateMarkerServiceConsumer consumer,List<POI> poiList, GoogleMap map, String query) {
+    public void updateMarkers(IUpdateMarkerServiceConsumer consumer, List<POI> poiList, GoogleMap map, String query) {
         synchronized (lock) {
             if (updateMarkersTask != null) {
                 updateMarkersTask.cancel(true);
             }
-
-            updateMarkersTask = new UpdateMarkersTask(consumer, poiList, query, map);
+        }
+        updateMarkersTask = new UpdateMarkersTask(consumer, poiList, query, map);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            updateMarkersTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+        else {
             updateMarkersTask.execute();
         }
     }
 
-    public static UpdateMarkersService getInstance(){
+    public static UpdateMarkersService getInstance() {
         return instance;
     }
 }

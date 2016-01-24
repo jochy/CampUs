@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.ExifUtils;
 import campus.m2dl.ane.campus.MapConfiguration;
 import campus.m2dl.ane.campus.R;
@@ -59,9 +60,11 @@ import campus.m2dl.ane.campus.activity.listener.CampUsOnInfoWindowsClickListener
 import campus.m2dl.ane.campus.activity.listener.CampUsTextWatcher;
 import campus.m2dl.ane.campus.model.POI;
 import campus.m2dl.ane.campus.model.TagImg;
+import campus.m2dl.ane.campus.model.mock.POImock;
 import campus.m2dl.ane.campus.service.IUpdateMarkerServiceConsumer;
 import campus.m2dl.ane.campus.service.MessageService;
 import campus.m2dl.ane.campus.service.UpdateMarkersService;
+import campus.m2dl.ane.campus.thread.RetreivePOITask;
 
 public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, IUpdateMarkerServiceConsumer {
 
@@ -77,8 +80,6 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         MapsInitializer.initialize(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camp_us);
-        // Fixme: comment that line !
-        showDebugMarker();
 
         try {
             tags = (EditText) findViewById(R.id.adresseMap);
@@ -104,7 +105,11 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
             map.moveCamera(center);
             map.animateCamera(zoom);
 
-            UpdateMarkersService.getInstance().updateMarkers(this, getPoiList(), map, null);
+            new RetreivePOITask(this, (EditText) findViewById(R.id.adresseMap), map).execute(AppConfiguration.URL_RETREIVE_POI);
+
+            // Fixme: comment that line !
+            //showDebugMarker();
+
         } catch (Exception e) {
             // If no GooglePlay service, then let google display its message
             findViewById(R.id.adresseMap).setVisibility(View.INVISIBLE);
@@ -121,9 +126,7 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
     }
 
     private void showDebugMarker() {
-        // Fixme: don't use that method
-        // poiList = POImock.getPoiList();
-        new RetreivePOITask().execute("http://camp-us.net16.net/script_php/get_all_poi.php");
+        poiList = POImock.getPoiList();
     }
 
     @Override
@@ -191,101 +194,5 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails", Toast.LENGTH_SHORT).show();
         return false;
     }
-
-
-    public class RetreivePOITask extends AsyncTask<String, Void, String> {
-
-        POI poi;
-
-        @Override
-        protected String doInBackground(String... urls) {
-
-            HttpClient httpclient = new DefaultHttpClient();
-            try {
-                poiList.clear();
-                HttpPost httpPost = new HttpPost(urls[0]);
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                HttpResponse httpresponse = httpclient.execute(httpPost);
-                HttpEntity httpentity = httpresponse.getEntity();
-
-                if (httpentity != null) {
-                    JSONObject jso = new JSONObject(inputStreamToString(
-                            httpentity.getContent()).toString());
-                    JSONArray tabPOI = jso.optJSONArray("POI");
-
-                    for (int i = 0; i < tabPOI.length(); i++) {
-
-                        JSONObject lignePoi = tabPOI.getJSONObject(i);
-                        poi = new POI();
-                        poi.sender = null;
-                        poi.description = lignePoi.optString("description");
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        Date startDate = new Date();
-                        try {
-                            startDate = df.parse(lignePoi.optString("date"));
-                            String newDateString = df.format(startDate);
-                            System.out.println(newDateString);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        poi.date = startDate;
-                        poi.poiId = lignePoi.optInt("ID");
-                        poi.image = null;
-                        poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
-                        poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
-                        List<String> items = new ArrayList<String>(Arrays.asList(lignePoi.optString("tags").split("\\s+")));
-                        poi.tags = items;
-                        poiList.add(poi);
-                    }
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-            }
-
-
-            return null;
-
-        }
-
-        @Override
-        protected void onPostExecute(String success) {
-
-
-            /*for (int i = 0; i < poiList.size() ; i++) {
-
-            }
-            System.out.prinlnt(); */
-
-        }
-
-        public StringBuilder inputStreamToString(InputStream is) {
-            BufferedReader br = null;
-            StringBuilder sb = new StringBuilder();
-            try {
-                br = new BufferedReader(new InputStreamReader(is));
-                String ligne = br.readLine();
-                while (ligne != null) {
-                    sb.append(ligne);
-                    ligne = br.readLine();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("Erreur de flux d'entree", e.getMessage());
-            } finally {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return sb;
-        }
-
-
-    }
-
 
 }

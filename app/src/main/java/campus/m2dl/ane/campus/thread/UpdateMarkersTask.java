@@ -15,7 +15,7 @@ import campus.m2dl.ane.campus.service.IUpdateMarkerServiceConsumer;
 /**
  * Created by Alexandre on 21/01/2016.
  */
-public class UpdateMarkersTask extends AsyncTask {
+public class UpdateMarkersTask extends AsyncTask<String, Void, String> {
 
     private IUpdateMarkerServiceConsumer consumer;
     private List<POI> poiList;
@@ -30,7 +30,7 @@ public class UpdateMarkersTask extends AsyncTask {
     }
 
     @Override
-    protected Object doInBackground(Object[] params) {
+    protected String doInBackground(String... params) {
         final List<POI> matchPOI = new ArrayList<>();
 
         if (poiList == null || query == null) {
