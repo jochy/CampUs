@@ -1,25 +1,15 @@
 package campus.m2dl.ane.campus.activity;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import campus.m2dl.ane.campus.thread.RegisterTask;
 
 import campus.m2dl.ane.campus.R;
 
@@ -79,7 +69,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         if(!isError)
         {
-            new RegisterTask().execute("http://camp-us.net16.net/script_php/register.php");
+            new RegisterTask(firstname,lastname,login,password1,this)
+                    .execute("http://camp-us.net16.net/script_php/register.php");
             //Check en base si login déja existant
         }
 
@@ -112,51 +103,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
-    public class RegisterTask extends AsyncTask<String, Void, String> {
-
-        String response = "";
-        @Override
-        protected String doInBackground(String... urls) {
-
-            try {
-
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost(urls[0]);
-
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
-                nameValuePairs.add(new BasicNameValuePair("firstname",firstname ));
-                nameValuePairs.add(new BasicNameValuePair("lastname",lastname ));
-                nameValuePairs.add(new BasicNameValuePair("username",login));
-                nameValuePairs.add(new BasicNameValuePair("password",password1 ));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                response = httpclient.execute(httppost, responseHandler);
-
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-                response = "error";
-                return "error";
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String success) {
-
-            if (!response.trim().equals("error")) {
-                Toast.makeText(getApplicationContext(), "Inscription valide", Toast.LENGTH_LONG).show();
-                finish();
-            }
-            else {
-                Toast.makeText(getApplicationContext(), "Login déja existant ", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
 }
 
 

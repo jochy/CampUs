@@ -1,7 +1,13 @@
 package campus.m2dl.ane.campus.thread;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,37 +25,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import campus.m2dl.ane.campus.activity.CampUsActivity;
-import campus.m2dl.ane.campus.activity.LoginActivity;
-
-import static campus.m2dl.ane.campus.service.ProgressBar.showProgress;
 
 /**
- * Created by edouard on 23/01/16.
+ * Created by Nabil on 23/01/16.
  */
-public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
-    private String response = "", url, username, password;
-    EditText mPasswordView;
-    View mProgressBar;
-    private LoginActivity mActivity;
+public class UserLoginTask extends AsyncTask<String, Void, String> {
 
-    public UserLoginTask(LoginActivity activity) {
-        mActivity = activity;
-        mPasswordView = mActivity.mPasswordView;
-        mProgressBar = mActivity.mProgressView;
+    String response = "";
+    String username , password ;
+    Context context ;
+    EditText mPasswordView ;
+    View mProgressView;
+
+
+    public UserLoginTask(String username,String password, Context context , EditText mPasswordView, View mProgressView )
+    {
+        this.username = username ;
+        this.password = password ;
+        this.context = context ;
+        this.mPasswordView = mPasswordView ;
+        this.mProgressView = mProgressView ;
     }
 
     @Override
-    protected Boolean doInBackground(String... params) {
-        url = params[0];
-        username = params[1];
-        password = params[2];
+    protected String doInBackground(String... urls) {
 
-        showProgress(mActivity.getResources(), mPasswordView , true);
+
         try {
 
             HttpClient httpclient = new DefaultHttpClient();
-            /*"http://camp-us.net16.net/script_php/get_user.php"*/
-            HttpPost httppost = new HttpPost(url);
+            HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/get_user.php");
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
             nameValuePairs.add(new BasicNameValuePair("username",username ));
@@ -60,35 +65,54 @@ public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
             response = httpclient.execute(httppost, responseHandler);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
             response = "error";
-            return false;
+            return "error";
         }
 
-        if (!response.trim().equals("error")) {
-            return true;
-        } else {
-            return false;
-        }
+        return null;
     }
 
     @Override
-    protected void onPostExecute(Boolean success) {
+    protected void onPostExecute(String success) {
 
-        if (success) {
-            Toast.makeText(mActivity.getApplicationContext(), "Bienvenue " + username + " !", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(mActivity.getApplicationContext(), CampUsActivity.class);
-            mActivity.startActivity(intent);
-            mActivity.finish();
+        if (!response.trim().equals("error")) {
+            Toast.makeText(context, "Bienvenue " + username + " !", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(context, CampUsActivity.class);
+            context.startActivity(intent);
+            ((Activity)context).finish();
         }
         else {
-            //Toast.makeText(getApplicationContext(), "Login ou mot de passe incorrect !", Toast.LENGTH_LONG).show();
-            mActivity.mPasswordView.setError("Mot de passe incorrect");
-            mActivity.mPasswordView.requestFocus();
+            Toast.makeText(context, "Login ou mot de passe incorrect !", Toast.LENGTH_LONG).show();
+            mPasswordView.setError("Mot de passe incorrect");
+            mPasswordView.requestFocus();
         }
 
-        showProgress(mActivity.getResources(), mProgressBar, false
-        );
+        showProgress(false);
     }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
 
 }
