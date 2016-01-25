@@ -98,11 +98,23 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                 Log.e("RetrievePOITask", e.getMessage());
             }
 
-            consumer.updatePoiList(poiList);
+            for(POI p : poiList){
+                boolean found = false;
+                for(POI p2 : consumer.getPOIList()){
+                    if(p2.poiId == p.poiId){
+                        found = true;
+                    }
+                }
+
+                if(!found){
+                    consumer.getPOIList().add(p);
+                }
+            }
+
             consumer.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    UpdateMarkersService.getInstance().updateMarkers(consumer, poiList, map, filterText.getText().toString());
+                    UpdateMarkersService.getInstance().updateMarkers(consumer, consumer.getPOIList(), map, filterText.getText().toString());
                 }
             });
 

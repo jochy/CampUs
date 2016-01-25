@@ -23,7 +23,7 @@ public class CampUsOnInfoWindowsClickListener implements GoogleMap.OnInfoWindowC
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        for (POI p : campUsActivity.getPoiList()) {
+        for (POI p : campUsActivity.getPOIList()) {
             if (marker.equals(p.marker)) {
                 Intent intent = new Intent(campUsActivity, MarkerInfoActivity.class);
                 MessageService.message = p;

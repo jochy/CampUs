@@ -160,14 +160,6 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         }
     }
 
-    public void updatePoiList(List<POI> poiList) {
-        this.poiList = poiList;
-    }
-
-    public List<POI> getPoiList() {
-        return this.poiList;
-    }
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         Toast.makeText(getBaseContext(), "Appuyez sur la description pour plus de détails",
@@ -175,4 +167,8 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
         return false;
     }
 
+    @Override
+    public List<POI> getPOIList() {
+        return poiList;
+    }
 }

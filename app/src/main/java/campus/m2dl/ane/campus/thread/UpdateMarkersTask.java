@@ -55,7 +55,7 @@ public class UpdateMarkersTask extends AsyncTask<String, Void, String> {
         consumer.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (POI p : poiList) {
+                for (POI p : consumer.getPOIList()) {
                     try {
                         p.marker.remove();
                     } catch (Exception e) {
@@ -64,18 +64,18 @@ public class UpdateMarkersTask extends AsyncTask<String, Void, String> {
                     p.marker = null;
                 }
 
-                for (POI p : matchPOI) {
-                    p.marker = map.addMarker(new MarkerOptions()
-                            .flat(false)
-                            .position(p.position)
-                            .icon(BitmapDescriptorFactory.fromResource(p.tagImg.resourceId))
-                            .title(p.tagImg.text)
-                            .snippet(p.description));
+                for(POI p : consumer.getPOIList()){
+                    if(matchPOI.contains(p)){
+                        p.marker = map.addMarker(new MarkerOptions()
+                                .flat(false)
+                                .position(p.position)
+                                .icon(BitmapDescriptorFactory.fromResource(p.tagImg.resourceId))
+                                .title(p.tagImg.text)
+                                .snippet(p.description));
+                    }
                 }
             }
         });
-
-        consumer.updatePoiList(poiList);
 
         return null;
     }

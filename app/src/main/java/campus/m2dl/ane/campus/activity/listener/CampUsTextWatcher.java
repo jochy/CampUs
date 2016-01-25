@@ -28,7 +28,7 @@ public class CampUsTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        UpdateMarkersService.getInstance().updateMarkers(campUsActivity, campUsActivity.getPoiList(), map, s.toString());
+        UpdateMarkersService.getInstance().updateMarkers(campUsActivity, campUsActivity.getPOIList(), map, s.toString());
     }
 
     @Override
