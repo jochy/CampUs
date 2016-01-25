@@ -1,13 +1,9 @@
 package campus.m2dl.ane.campus.thread;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,6 +22,8 @@ import java.util.List;
 
 import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.activity.CampUsActivity;
+
+import static campus.m2dl.ane.campus.service.ProgressBar.showProgress;
 
 /**
  * Created by Nabil on 23/01/16.
@@ -49,6 +47,14 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... urls) {
+
+        // test
+        /*Bitmap b;
+        b = loadImage("http://pbs.twimg.com/media/BsBSEnPCAAAU-KH.jpg");
+
+        CacheStore cacheStore = CacheStore.getInstance();
+        cacheStore.saveCacheFile("burger","hey", b);
+*/
         try {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost(AppConfiguration.URL_LOGIN);
@@ -83,33 +89,7 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
             mPasswordView.requestFocus();
         }
 
-        showProgress(false);
+        showProgress(context.getResources(), mProgressView ,false);
     }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = context.getResources()
-                    .getInteger(android.R.integer.config_shortAnimTime);
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
-        else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        }
-    }
-
 
 }

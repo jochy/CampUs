@@ -12,5 +12,7 @@ public class AppConfiguration {
 
     public static final String URL_LOGIN = "http://camp-us.net16.net/script_php/get_user.php";
 
+    public static final String URI_CACHE = "/Android/data/m2dl.CampUs/cache/img/";
+
     public static final boolean DEBUG = false;
 }
