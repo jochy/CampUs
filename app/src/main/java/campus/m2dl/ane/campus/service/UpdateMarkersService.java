@@ -24,6 +24,7 @@ public class UpdateMarkersService {
     }
 
     public void updateMarkers(IUpdateMarkerServiceConsumer consumer, List<POI> poiList, GoogleMap map, String query) {
+        // If already running, then stop it
         synchronized (lock) {
             if (updateMarkersTask != null) {
                 updateMarkersTask.cancel(true);

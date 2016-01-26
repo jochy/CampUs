@@ -14,5 +14,7 @@ public class AppConfiguration {
 
     public static final String URI_CACHE = "/Android/data/m2dl.CampUs/cache/img/";
 
+    public static final String CACHE_FILENAME = ".cache";
+
     public static final boolean DEBUG = false;
 }

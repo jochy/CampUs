@@ -1,7 +1,6 @@
 package campus.m2dl.ane.campus.service;
 
 import java.util.List;
-
 import campus.m2dl.ane.campus.model.POI;
 
 /**

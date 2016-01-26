@@ -36,7 +36,7 @@
         android:layout_marginRight="10dp"
         android:background="@drawable/takepicture"
         android:onClick="takePicture"
-        android:visibility="invisible"/>
+        android:visibility="visible"/>
 
 
 </RelativeLayout>

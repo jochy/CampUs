@@ -19,27 +19,25 @@ import java.util.HashMap;
 
 import campus.m2dl.ane.campus.AppConfiguration;
 
-
-public class CacheStore {
-    private static CacheStore INSTANCE = null;
+public class CacheService {
+    private static CacheService INSTANCE = new CacheService();
     private HashMap<String, String> cacheMap;
     private HashMap<String, Bitmap> bitmapMap;
-    private static final String cacheDir = AppConfiguration.URI_CACHE;
-    private static final String CACHE_FILENAME = ".cache";
 
     @SuppressWarnings("unchecked")
-    private CacheStore() {
+    private CacheService() {
         cacheMap = new HashMap<String, String>();
         bitmapMap = new HashMap<String, Bitmap>();
-        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),cacheDir);
-        if(!fullCacheDir.exists()) {
+        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),
+                AppConfiguration.URI_CACHE);
+        if (!fullCacheDir.exists()) {
             Log.i("CACHE", "Directory doesn't exist");
             cleanCacheStart();
             return;
         }
         try {
-            ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(fullCacheDir.toString(), CACHE_FILENAME))));
-            cacheMap = (HashMap<String,String>)is.readObject();
+            ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(fullCacheDir.toString(), AppConfiguration.CACHE_FILENAME))));
+            cacheMap = (HashMap<String, String>) is.readObject();
             is.close();
         } catch (StreamCorruptedException e) {
             Log.i("CACHE", "Corrupted stream");
@@ -58,7 +56,8 @@ public class CacheStore {
 
     private void cleanCacheStart() {
         cacheMap = new HashMap<String, String>();
-        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),cacheDir);
+        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),
+                AppConfiguration.URI_CACHE);
         fullCacheDir.mkdirs();
         File noMedia = new File(fullCacheDir.toString(), ".nomedia");
         try {
@@ -70,19 +69,13 @@ public class CacheStore {
         }
     }
 
-    private synchronized static void createInstance() {
-        if(INSTANCE == null) {
-            INSTANCE = new CacheStore();
-        }
-    }
-
-    public static CacheStore getInstance() {
-        if(INSTANCE == null) createInstance();
+    public static CacheService getInstance() {
         return INSTANCE;
     }
 
     public void saveCacheFile(String fileName, String cacheUri, Bitmap image) {
-        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),cacheDir);
+        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),
+                AppConfiguration.URI_CACHE);
         String fileLocalName = fileName + ".PNG"; // new  SimpleDateFormat("ddMMyyhhmmssSSS").format(new java.util.Date())+".PNG";
         File fileUri = new File(fullCacheDir.toString(), fileLocalName);
         FileOutputStream outStream = null;
@@ -95,7 +88,7 @@ public class CacheStore {
             Log.i("CACHE", "Saved file " + cacheUri + " (which is now " + fileUri.toString() + ") correctly");
             bitmapMap.put(cacheUri, image);
             ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(
-                    new FileOutputStream(new File(fullCacheDir.toString(), CACHE_FILENAME))));
+                    new FileOutputStream(new File(fullCacheDir.toString(), AppConfiguration.CACHE_FILENAME))));
             os.writeObject(cacheMap);
             os.close();
         } catch (FileNotFoundException e) {
@@ -108,13 +101,14 @@ public class CacheStore {
     }
 
     public Bitmap getCacheFile(String cacheUri) {
-        if(bitmapMap.containsKey(cacheUri)) return (Bitmap)bitmapMap.get(cacheUri);
+        if (bitmapMap.containsKey(cacheUri)) return (Bitmap) bitmapMap.get(cacheUri);
 
-        if(!cacheMap.containsKey(cacheUri)) return null;
+        if (!cacheMap.containsKey(cacheUri)) return null;
         String fileLocalName = cacheMap.get(cacheUri).toString();
-        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),cacheDir);
+        File fullCacheDir = new File(Environment.getExternalStorageDirectory().toString(),
+                AppConfiguration.URI_CACHE);
         File fileUri = new File(fullCacheDir.toString(), fileLocalName);
-        if(!fileUri.exists()) return null;
+        if (!fileUri.exists()) return null;
 
         Log.i("CACHE", "File " + cacheUri + " has been found in the Cache");
         Bitmap bm = BitmapFactory.decodeFile(fileUri.toString());

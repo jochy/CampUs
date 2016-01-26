@@ -22,8 +22,10 @@ import java.util.List;
 
 import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.activity.CampUsActivity;
+import campus.m2dl.ane.campus.model.User;
+import campus.m2dl.ane.campus.service.MessageService;
 
-import static campus.m2dl.ane.campus.service.ProgressBar.showProgress;
+import static campus.m2dl.ane.campus.activity.components.ProgressBar.showProgress;
 
 /**
  * Created by Nabil on 23/01/16.
@@ -52,7 +54,7 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
         /*Bitmap b;
         b = loadImage("http://pbs.twimg.com/media/BsBSEnPCAAAU-KH.jpg");
 
-        CacheStore cacheStore = CacheStore.getInstance();
+        CacheService cacheStore = CacheService.getInstance();
         cacheStore.saveCacheFile("burger","hey", b);
 */
         try {
@@ -78,6 +80,8 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String success) {
         if (!response.trim().equals("error")) {
+            MessageService.currentUser = new User(username, null, null, null);
+
             Toast.makeText(context, "Bienvenue " + username + " !", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(context, CampUsActivity.class);
             context.startActivity(intent);
@@ -89,7 +93,7 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
             mPasswordView.requestFocus();
         }
 
-        showProgress(context.getResources(), mProgressView ,false);
+        showProgress(context.getResources(), mProgressView, false);
     }
 
 }

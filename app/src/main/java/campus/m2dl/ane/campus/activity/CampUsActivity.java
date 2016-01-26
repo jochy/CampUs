@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,10 +24,12 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.Marker;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.ExifUtils;
 import campus.m2dl.ane.campus.MapConfiguration;
@@ -131,6 +134,12 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
     }
 
     public void takePicture(View view) {
+        if (MessageService.currentPosition == null) {
+            Toast.makeText(getBaseContext(),
+                    "Votre position n'est pas acquise, vous ne pouvez pas prendre de photo", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // Création de l'intent de type ACTION_IMAGE_CAPTURE
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");

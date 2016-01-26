@@ -87,7 +87,7 @@ public class TagCreationActivity extends AppCompatActivity {
         POI poi = new POI();
         poi.image = bitmap;
         poi.position = currentPosition;
-        poi.sender = null; // FIXME : current user !
+        poi.sender = MessageService.currentUser;
         poi.description = ((EditText) findViewById(R.id.descriptionField)).getText().toString();
         poi.tags = new ArrayList<>();
         for (String s : ((EditText) findViewById(R.id.descriptionField)).getText().toString().split(" ")) {

@@ -1,4 +1,4 @@
-package campus.m2dl.ane.campus.service;
+package campus.m2dl.ane.campus.activity.components;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
