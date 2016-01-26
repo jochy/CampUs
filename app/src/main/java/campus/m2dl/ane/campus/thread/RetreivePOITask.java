@@ -87,7 +87,7 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                         poi.date = startDate;
                         poi.poiId = lignePoi.optInt("ID");
                         poi.image = null; // Fixme : affect it
-                        poi.tagImg = TagImg.valueOf(lignePoi.optString("type"));
+                        poi.tagImg = TagImg.valueOf(lignePoi.optString("type").trim().toUpperCase());
                         poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
                         poi.tags = Arrays.asList(lignePoi.optString("tags").split("\\s+"));;
                         poiList.add(poi);
