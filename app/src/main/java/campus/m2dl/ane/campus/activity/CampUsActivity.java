@@ -98,6 +98,7 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
 
             // Force center
             map.moveCamera(center);
+            map.animateCamera(zoom);
         } catch (Exception e) {
             // If no GooglePlay service, then let google display its message
             findViewById(R.id.adresseMap).setVisibility(View.INVISIBLE);
