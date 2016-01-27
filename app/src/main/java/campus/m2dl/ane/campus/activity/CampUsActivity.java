@@ -73,8 +73,14 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
                 locationManager.requestLocationUpdates("fused",
                         AppConfiguration.SENSOR_REFRESH_INTERVAL, 3, locationListener);
             } catch (Exception e) {
-                Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS",
-                        Toast.LENGTH_LONG).show();
+                // Try the old way with GPS only
+                try {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            AppConfiguration.SENSOR_REFRESH_INTERVAL, 3, locationListener);
+                } catch (Exception e1) {
+                    Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS",
+                            Toast.LENGTH_LONG).show();
+                }
             }
 
             // Default Zoom + center on the Admin building
@@ -90,6 +96,8 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
                 showDebugMarker();
             }
 
+            // Force center
+            map.moveCamera(center);
         } catch (Exception e) {
             // If no GooglePlay service, then let google display its message
             findViewById(R.id.adresseMap).setVisibility(View.INVISIBLE);
