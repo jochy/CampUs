@@ -16,9 +16,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import campus.m2dl.ane.campus.thread.UserLoginTask;
-
 import campus.m2dl.ane.campus.R;
+import campus.m2dl.ane.campus.thread.UserLoginTask;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -71,6 +70,26 @@ public class LoginActivity extends AppCompatActivity {
     {
         username = mLoginView.getText().toString();
         password = mPasswordView.getText().toString();
+        /*BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap b = BitmapFactory.decodeFile(AppConfiguration.URI_CACHE+"Pic.png", options);
+        //CacheService.getInstance().saveCacheFile("Pic.png", AppConfiguration.URI_CACHE,b);
+        //Bitmap b= CacheService.getInstance().getCacheFile(AppConfiguration.URI_CACHE+"Pic.png");
+
+        POI poi = new POI();
+
+        poi.sender = new User("edsolat", "edsolat", "edsolat", "edsolat");
+        poi.description = "test";
+        poi.date = new Date();
+
+        poi.image = b;
+        poi.tagImg = TagImg.WATER;
+        poi.position = new LatLng(43.566994, 1.470158);
+        List<String> s = new ArrayList<String>();
+        s.add("testTag");
+        poi.tags = s;
+
+        new SendPoiToDBTask(this).execute(poi);*/
 
 
         if (!isOnline()) {

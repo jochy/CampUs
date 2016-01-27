@@ -50,13 +50,6 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls) {
 
-        // test
-        /*Bitmap b;
-        b = loadImage("http://pbs.twimg.com/media/BsBSEnPCAAAU-KH.jpg");
-
-        CacheService cacheStore = CacheService.getInstance();
-        cacheStore.saveCacheFile("burger","hey", b);
-*/
         try {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost(AppConfiguration.URL_LOGIN);

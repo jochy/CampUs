@@ -1,6 +1,7 @@
 package campus.m2dl.ane.campus.thread;
 
 import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
@@ -8,25 +9,29 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import campus.m2dl.ane.campus.activity.TagCreationActivity;
+import campus.m2dl.ane.campus.AppConfiguration;
 import campus.m2dl.ane.campus.model.POI;
+import campus.m2dl.ane.campus.service.CacheService;
 
 /**
  * Created by edouard on 23/01/16.
  */
 public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
 
-    String response = "";
-    private TagCreationActivity mActivity;
+    String response = "", response2 = "", response3 = "";
+    private AppCompatActivity/*TagCreationActivity*/ mActivity;
 
-    public SendPoiToDBTask(TagCreationActivity activity) {
+    public SendPoiToDBTask(AppCompatActivity/*TagCreationActivity*/ activity) {
         mActivity = activity;
     }
 
@@ -34,8 +39,12 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
     protected String doInBackground(POI... pois) {
 
         POI poi = pois[0];
-        try {
+        // TODO : add in appConfig...
+        String url = "camp-us.net16.net/images/";
+        File file;
 
+        // Send POI to BD
+        try {
 
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/insert_poi.php");
@@ -44,22 +53,74 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             /** TODO  **/
             nameValuePairs.add(new BasicNameValuePair("longitude",String.valueOf(poi.position.longitude)));
             nameValuePairs.add(new BasicNameValuePair("latitude", String.valueOf(poi.position.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("sender", poi.sender.getUsername()));
             nameValuePairs.add(new BasicNameValuePair("description", poi.description));
-            nameValuePairs.add(new BasicNameValuePair("user", poi.sender.getUsername()));
-            nameValuePairs.add(new BasicNameValuePair("type", ""));
+
             nameValuePairs.add(new BasicNameValuePair("tags", poi.tags.toString()));
+            nameValuePairs.add(new BasicNameValuePair("date", poi.date.toString()));
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             response = httpclient.execute(httppost, responseHandler);
 
         } catch (Exception e) {
-            Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            //Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             response = "error";
             return "error";
         }
 
+
+
+        //get ID of the inserted POI
+        try {
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/get_last_poi_id.php");
+
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+            /** TODO  **/
+            nameValuePairs.add(new BasicNameValuePair("longitude",String.valueOf(poi.position.longitude)));
+            nameValuePairs.add(new BasicNameValuePair("latitude", String.valueOf(poi.position.latitude)));
+            nameValuePairs.add(new BasicNameValuePair("sender", poi.sender.getUsername()));
+
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+
+            ResponseHandler<String> responseHandler = new BasicResponseHandler();
+            response2  = httpclient.execute(httppost, responseHandler);
+            if (!response2.trim().equals("error")) {
+                poi.poiId = Integer.valueOf(response2.trim());
+
+                pois[0] = poi;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+            response2 = "error";
+            return "error";
+        }
+
+        CacheService.getInstance().saveCacheFile(Integer.toString(poi.poiId), Integer.toString(poi.poiId), poi.image );
+        file = new File(AppConfiguration.URI_CACHE, Integer.toString(poi.poiId) + ".png");
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+
+            HttpPost httppost = new HttpPost(url);
+
+            InputStreamEntity reqEntity = new InputStreamEntity(
+                    new FileInputStream(file), -1);
+            reqEntity.setContentType("binary/octet-stream");
+            reqEntity.setChunked(true); // Send in multiple parts if needed
+            httppost.setEntity(reqEntity);
+            httpclient.execute(httppost);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+            response3 = "error";
+            return "error";
+        }
 
         return null;
     }
@@ -67,7 +128,7 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
     @Override
     protected void onPostExecute(String success) {
 
-        if (!response.trim().equals("error")) {
+        if (!response.trim().equals("error") && !response2.trim().equals("error") && !response3.trim().equals("error")) {
             Toast.makeText(mActivity.getApplicationContext(), "Le tag a été ajouté !", Toast.LENGTH_LONG).show();
             mActivity.finish();
         }
