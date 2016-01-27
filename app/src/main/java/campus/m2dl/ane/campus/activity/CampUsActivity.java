@@ -72,7 +72,7 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
                     findViewById(R.id.takePicture));
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                        AppConfiguration.SENSOR_REFRESH_INTERVAL, 10, locationListener);
+                        AppConfiguration.SENSOR_REFRESH_INTERVAL, 1, locationListener);
             } catch (Exception e) {
                 Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS",
                         Toast.LENGTH_LONG).show();
