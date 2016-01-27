@@ -68,8 +68,7 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
 
             LocationManager locationManager = (LocationManager) getSystemService(
                     Context.LOCATION_SERVICE);
-            LocationListener locationListener = new CampUsLocationListener(this, map,
-                    findViewById(R.id.takePicture));
+            LocationListener locationListener = new CampUsLocationListener(this, map);
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         AppConfiguration.SENSOR_REFRESH_INTERVAL, 1, locationListener);

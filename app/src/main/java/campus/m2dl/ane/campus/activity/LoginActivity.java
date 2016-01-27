@@ -35,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordView = (EditText) findViewById(R.id.password1Login);
         mProgressView = (View) findViewById(R.id.progressBar);
         showProgress(false);
-
     }
 
     @Override

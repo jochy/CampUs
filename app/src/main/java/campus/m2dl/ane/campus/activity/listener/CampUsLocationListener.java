@@ -22,16 +22,15 @@ public class CampUsLocationListener implements LocationListener {
     private GoogleMap map;
     private Marker position;
     private CampUsActivity activity;
-    private View takePicture;
 
-    public CampUsLocationListener(CampUsActivity activity, GoogleMap map, View takePicture) {
+    public CampUsLocationListener(CampUsActivity activity, GoogleMap map) {
         this.activity = activity;
         this.map = map;
-        this.takePicture = takePicture;
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Toast.makeText(activity.getBaseContext(), "onLocationChanged", Toast.LENGTH_SHORT).show();
         if (position == null) {
             position = map.addMarker(new MarkerOptions()
                     .position(new LatLng(location.getLatitude(), location.getLongitude()))
@@ -42,17 +41,19 @@ public class CampUsLocationListener implements LocationListener {
         }
 
         MessageService.currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
-        takePicture.setVisibility(View.VISIBLE);
+
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // Nothing
+        Toast.makeText(activity.getBaseContext(), "onStatusChanged", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         // Nothing
+        Toast.makeText(activity.getBaseContext(), "onProvierEnabled", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -62,7 +63,8 @@ public class CampUsLocationListener implements LocationListener {
             position.remove();
             position = null;
         }
+
         MessageService.currentPosition = null;
-        takePicture.setVisibility(View.INVISIBLE);
+        Toast.makeText(activity.getBaseContext(), "onProvierDisabled", Toast.LENGTH_SHORT).show();
     }
 }
