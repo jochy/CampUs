@@ -71,7 +71,7 @@ public class CampUsActivity extends AppCompatActivity implements GoogleMap.OnMar
             LocationListener locationListener = new CampUsLocationListener(this, map);
             try {
                 locationManager.requestLocationUpdates("fused",
-                        AppConfiguration.SENSOR_REFRESH_INTERVAL, 1, locationListener);
+                        AppConfiguration.SENSOR_REFRESH_INTERVAL, 3, locationListener);
             } catch (Exception e) {
                 Toast.makeText(getBaseContext(), "Impossible de démarrer le GPS",
                         Toast.LENGTH_LONG).show();
