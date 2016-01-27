@@ -87,9 +87,14 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                         poi.date = startDate;
                         poi.poiId = lignePoi.optInt("ID");
                         poi.image = null; // Fixme : affect it
-                        poi.tagImg = TagImg.valueOf(lignePoi.optString("type").trim().toUpperCase());
+                        try {
+                            poi.tagImg = TagImg.valueOf(lignePoi.optString("type").trim().toUpperCase());
+                        } catch (Exception e) {
+                            poi.tagImg = TagImg.OTHER;
+                        }
                         poi.position = new LatLng(lignePoi.optDouble("latitude"), lignePoi.optDouble("longitude"));
-                        poi.tags = Arrays.asList(lignePoi.optString("tags").split("\\s+"));;
+                        poi.tags = Arrays.asList(lignePoi.optString("tags").split("\\s+"));
+                        ;
                         poiList.add(poi);
                     }
                 }
@@ -98,15 +103,15 @@ public class RetreivePOITask extends AsyncTask<String, Void, String> {
                 Log.e("RetrievePOITask", e.getMessage());
             }
 
-            for(POI p : poiList){
+            for (POI p : poiList) {
                 boolean found = false;
-                for(POI p2 : consumer.getPOIList()){
-                    if(p2.poiId == p.poiId){
+                for (POI p2 : consumer.getPOIList()) {
+                    if (p2.poiId == p.poiId) {
                         found = true;
                     }
                 }
 
-                if(!found){
+                if (!found) {
                     consumer.getPOIList().add(p);
                 }
             }
