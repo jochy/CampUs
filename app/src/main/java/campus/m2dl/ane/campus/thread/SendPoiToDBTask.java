@@ -55,7 +55,7 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             nameValuePairs.add(new BasicNameValuePair("latitude", String.valueOf(poi.position.latitude)));
             nameValuePairs.add(new BasicNameValuePair("sender", poi.sender.getUsername()));
             nameValuePairs.add(new BasicNameValuePair("description", poi.description));
-
+            nameValuePairs.add(new BasicNameValuePair("tagImg", poi.tagImg.getBdType()));
             nameValuePairs.add(new BasicNameValuePair("tags", poi.tags.toString()));
             nameValuePairs.add(new BasicNameValuePair("date", poi.date.toString()));
 
