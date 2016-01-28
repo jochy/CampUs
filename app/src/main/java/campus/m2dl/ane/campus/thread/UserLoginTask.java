@@ -62,7 +62,7 @@ public class UserLoginTask extends AsyncTask<String, Void, String> {
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
             response = httpclient.execute(httppost, responseHandler);
         } catch (Exception e) {
-            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
             response = "error";
             return "error";
         }

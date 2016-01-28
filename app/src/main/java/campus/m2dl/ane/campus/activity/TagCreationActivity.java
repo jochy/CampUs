@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -30,6 +29,8 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -88,7 +89,6 @@ public class TagCreationActivity extends AppCompatActivity {
     }
 
     public void sendNewPoi(View view) {
-        Toast.makeText(getApplicationContext(),"button clicked",Toast.LENGTH_LONG).show();
         poi = new POI();
         poi.image = bitmap;
         poi.position = currentPosition;
@@ -98,11 +98,17 @@ public class TagCreationActivity extends AppCompatActivity {
         for (String s : ((EditText) findViewById(R.id.tagList)).getText().toString().split(" ")) {
             poi.tags.add(s);
         }
-        poi.date = new Date();
+        Date date = new Date();
+        try {
+             date = new SimpleDateFormat("yyyy-MM-dd").parse(new Date().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        poi.date = date ;
         poi.tagImg = (TagImg) ((Spinner) findViewById(R.id.spinner)).getSelectedItem();
-
         new SendPoiToDBTask3().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
+        this.finish();
     }
 
     public class SendPoiToDBTask3 extends AsyncTask<String, Void, String> {
@@ -141,7 +147,6 @@ public class TagCreationActivity extends AppCompatActivity {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/get_last_poi_id.php");
                 //Toast.makeText(context, "RESP 2", Toast.LENGTH_LONG).show();
-
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
                 /** TODO  **/
                 nameValuePairs.add(new BasicNameValuePair("longitude", String.valueOf(poi.position.longitude)));
@@ -162,44 +167,39 @@ public class TagCreationActivity extends AppCompatActivity {
                 //Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
             }
 
-
-            InputStream is;
-            BitmapFactory.Options bfo;
-            //Bitmap bitmapOrg;
-            ByteArrayOutputStream bao;
-            bfo = new BitmapFactory.Options();
-            bfo.inSampleSize = 2;
-            FileInputStream fis = null;
-            bao = new ByteArrayOutputStream();
-            poi.image.compress(Bitmap.CompressFormat.JPEG, 90, bao);
-            byte[] ba = bao.toByteArray();
-            String ba1 = encodeBytes(ba);
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair("image", ba1));
-            nameValuePairs.add(new BasicNameValuePair("cmd", "testImage"));
-
             try {
+
+                BitmapFactory.Options bfo;
+                //Bitmap bitmapOrg;
+                ByteArrayOutputStream bao;
+                bfo = new BitmapFactory.Options();
+                bfo.inSampleSize = 2;
+                FileInputStream fis = null;
+                bao = new ByteArrayOutputStream();
+                poi.image.compress(Bitmap.CompressFormat.JPEG, 90, bao);
+                byte[] ba = bao.toByteArray();
+                String ba1 = encodeBytes(ba);
+                ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("image", ba1));
+                nameValuePairs.add(new BasicNameValuePair("cmd", "testImage"));
+
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://camp-us.net16.net/script_php/UploadImage.php");
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"UTF-8"));
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-
                 Log.v("log_tag", "In the try Loop");
             } catch (Exception e) {
                 e.printStackTrace();
-
-                //Toast.makeText(context, "Error in http connection " + e.toString(), Toast.LENGTH_LONG).show();
-                //return "error";
             }
-            return null ;
 
+            return "" ;
         }
 
         @Override
         protected void onPostExecute(String success) {
-            // Nothing
+
         }
 
 
