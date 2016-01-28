@@ -68,11 +68,11 @@
             android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonSendbuttonSend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="sendNewPoi"
-            android:text="Envoyer"/>
+            android:text="Envoyer"
+            android:onClick="sendNewPoi" />
 
     </LinearLayout>
 

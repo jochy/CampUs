@@ -19,14 +19,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import campus.m2dl.ane.campus.model.POI;
-import campus.m2dl.ane.campus.service.CacheService;
 
 import static campus.m2dl.ane.campus.service.Base64.encodeBytes;
 
@@ -35,9 +33,9 @@ import static campus.m2dl.ane.campus.service.Base64.encodeBytes;
  */
 public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
 
+
     String response = "", response2 = "", response3 = "";
     private AppCompatActivity/*TagCreationActivity*/ mActivity;
-
     public SendPoiToDBTask(AppCompatActivity/*TagCreationActivity*/ activity) {
         mActivity = activity;
     }
@@ -47,8 +45,8 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
 
         POI poi = pois[0];
         // TODO : add in appConfig...
-        String url = "camp-us.net16.net/images/";
-        File file;
+        // String url = "camp-us.net16.net/images/";
+        //File file;
 
         // Send POI to BD
         try {
@@ -74,9 +72,8 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             e.printStackTrace();
             //Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             response = "error";
-            return "error";
+            //return "error";
         }
-
 
 
         //get ID of the inserted POI
@@ -105,10 +102,10 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             e.printStackTrace();
             //Toast.makeText(mActivity.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             response2 = "error";
-            return "error";
+            //return "error";
         }
 
-        CacheService.getInstance().saveCacheFile(Integer.toString(poi.poiId), Integer.toString(poi.poiId), poi.image );
+        //CacheService.getInstance().saveCacheFile(Integer.toString(poi.poiId), Integer.toString(poi.poiId), poi.image );
         /*file = new File(AppConfiguration.URI_CACHE, Integer.toString(poi.poiId) + ".png");
         try {
             HttpClient httpclient = new DefaultHttpClient();
@@ -129,7 +126,7 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             return "error";
         }*/
 
-        CacheService.getInstance().saveCacheFile(Integer.toString(poi.poiId), Integer.toString(poi.poiId), poi.image );
+        //CacheService.getInstance().saveCacheFile(Integer.toString(poi.poiId), Integer.toString(poi.poiId), poi.image );
 
         InputStream is;
         BitmapFactory.Options bfo;
@@ -144,7 +141,7 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
         String ba1 = encodeBytes(ba);
         ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         nameValuePairs.add(new BasicNameValuePair("image",ba1));
-        nameValuePairs.add(new BasicNameValuePair("cmd","image_android1"));
+        nameValuePairs.add(new BasicNameValuePair("cmd",String.valueOf(poi.poiId)));
 
         try{
             HttpClient httpclient = new DefaultHttpClient();
@@ -157,11 +154,9 @@ public class SendPoiToDBTask extends AsyncTask<POI, Void, String> {
             Log.v("log_tag", "In the try Loop");
         }catch(Exception e){
             Log.v("log_tag", "Error in http connection "+e.toString());
-            return "error";
+            //return "error";
 
         }
-
-
 
 
         return null;
