@@ -2,19 +2,41 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
                 tools:context=".CampUsActivity">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <fragment
         android:id="@+id/map"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/rsz_1rsz_map"
-        />
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp">
+
+        <EditText
+            android:id="@+id/adresseMap"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rect_text_edit1"
+            android:ems="15"
+            android:hint="Rechercher un Tag"
+            android:padding="10dp"
+            android:singleLine="true"/>
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/takePicture"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/takepicture"
+        android:onClick="takePicture"
+        android:visibility="visible"/>
+
 
 </RelativeLayout>
